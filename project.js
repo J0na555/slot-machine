@@ -118,6 +118,7 @@ const getWinnings = (rows, bet, lines) => {
             winnings += bet * SYMBOL_VALUES[symbols[0]]
         }
     }
+    return winnings;
 }
 
 const game = () => {
