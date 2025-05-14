@@ -1,10 +1,3 @@
-// 1 deposit some money
-// 2 determine number of lines to bet on
-// 3 collect bet money
-// 4 spin the slot machine
-// 5 check if the user won
-// 6 give the user their winnings
-// 7 play again
 const prompt = require ("prompt-sync")();
 
 const ROWS = 3
@@ -95,12 +88,60 @@ const transpose = (reels) => {
     return rows;
 }
 
+const printRows = (rows) => {
+    for (const row of rows){
+        let rowString = "";
+        for (const [i, symbol] of row.entries()){
+            rowString += symbol
+            if( i != row.length - 1){
+                rowString += " | "
+            }
+        }
+        console.log(rowString)
+    }
+}
 
-let balance = deposit()
-const numberOfLines = getNumberOfLines()
-const bet = getBet(balance, numberOfLines)
-const reels = spin()
-console.log(reels)
-const rows = transpose(reels)
-console.log(reels)
-console.log(rows)
+const getWinnings = (rows, bet, lines) => {
+    let winnings = 0;
+
+    for (let row = 0; row < lines; row++){
+        const symbols = rows[row]
+        let allSame = true
+
+        for (const symbol of symbols){
+            if (symbol != symbol[0]){
+                allSame = false 
+                break;
+            }
+        }
+        if(allSame){
+            winnings += bet * SYMBOL_VALUES[symbols[0]]
+        }
+    }
+}
+
+const game = () => {
+    let balance = deposit()
+
+    while(true){
+        console.log("You have a balace of $" + String(balance))
+        const numberOfLines = getNumberOfLines()
+        const bet = getBet(balance, numberOfLines)
+        balance -= bet * numberOfLines
+        const reels = spin()
+        const rows = transpose(reels)
+        printRows(rows)
+        const winnings = getWinnings(rows, bet, numberOfLines)
+        balance += winnings
+        console.log("You won, $" + String(winnings));
+        if (balance <= 0){
+            console.log("You ran out of money!")
+            break;
+        }
+
+        const playAgain = prompt ("Do you want to play again? y/n :")
+        if (playAgain != 'y') break;
+    }
+}
+
+game()
